@@ -34,11 +34,13 @@ export const geraTabela = (rules: string) => {
       const [t, nt] = el.split("");
       const indexOfTerminal = terminais.findIndex((nt) => nt === t);
       // console.log("naoTerminal: ", nt, indexOfTerminal);
-      if (indexOfTerminal >= 0) {
-        if (dados[indexOfTerminal]) {
-          dados[indexOfTerminal] = dados[indexOfTerminal] + "," + nt;
-        } else {
-          dados[indexOfTerminal] = nt;
+      if (nt) {
+        if (indexOfTerminal >= 0) {
+          if (dados[indexOfTerminal]) {
+            dados[indexOfTerminal] = dados[indexOfTerminal] + "," + nt;
+          } else {
+            dados[indexOfTerminal] = nt;
+          }
         }
       }
 
