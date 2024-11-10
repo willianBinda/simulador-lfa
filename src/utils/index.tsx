@@ -50,10 +50,11 @@ function procuraOpcao(options: string[], searchTerm: string) {
 }
 
 export const validarGramatica = (gr: string, entrada: string) => {
-  //   console.log("gramatica string:", gr);
+  console.log("gramatica string:", gr);
+  console.log(entrada);
   const gramatica = gr.split("\n");
 
-  // console.log("gramatica:", gramatica);
+  //   console.log("gramatica:", gramatica);
 
   const novaGramatica = gramatica.map((item, index) => {
     const naoTerminal = item[0];
@@ -63,11 +64,20 @@ export const validarGramatica = (gr: string, entrada: string) => {
   });
 
   //   console.log("nova gramatica: ", novaGramatica);
-
   // eslint-disable-next-line
   let naoTerminalAtual = "S";
 
-  entrada.split("").forEach((char, index) => {
+  const validarEntrada = entrada.split("");
+
+  if (!entrada.length) {
+    const optionEncontrada = novaGramatica[0]["S"].find((opt) => opt === "&");
+
+    if (!optionEncontrada) {
+      throw new Error("Entrada inválida");
+    }
+  }
+
+  validarEntrada.forEach((char, index) => {
     if (entrada.length - 1 === index) {
       //   console.log("******************");
       //   console.log("******************");
@@ -95,7 +105,11 @@ export const validarGramatica = (gr: string, entrada: string) => {
         if (optionEncontrada) {
           //   console.log("entrada encontrada ultima rep: ", optionEncontrada);
           //   console.log(optionEncontrada.length);
-          if (optionEncontrada.length !== 1) {
+          if (optionEncontrada.length === 1) {
+            // console.log("**************");
+            // console.log("**************");
+            // console.log("regras sem edison");
+          } else {
             //termina com edison
             // console.log("regras com edison");
             const naoTerminalRegra = optionEncontrada.split("")[1];
