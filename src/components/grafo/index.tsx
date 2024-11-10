@@ -18,10 +18,6 @@ export default function Graph({ nodes, edges }: GrafoType) {
           size: 20,
           color: "#000",
         },
-        color: {
-          border: "#3c3c3c",
-          background: "#6fa8dc",
-        },
       },
       edges: {
         color: { color: "#848484" },
