@@ -97,7 +97,27 @@ export const geraGrafo = (rules: string) => {
     });
   });
 
-  // console.log("resultado final: ", ed);
+  const result: { from: number; to: number; label: string }[] = [];
+
+  // Iterando sobre o array
+  edges.forEach((item) => {
+    // console.log(item);
+    // Verificando se já existe um objeto com from e to iguais no resultado
+    const existingItem = result.find(
+      (el) => el.from === item.from && el.to === item.to
+    );
+
+    if (existingItem) {
+      // Se encontrar, concatena a label com ","
+      existingItem.label += "," + item.label;
+    } else {
+      // Caso contrário, adiciona o item ao resultado
+      result.push({ ...item });
+    }
+  });
+
+  // console.log("edges: ", edges);
+  // console.log(result);
 
   // const edges = [
   //   { from: 0, to: 1, label: "a" },
@@ -115,6 +135,6 @@ export const geraGrafo = (rules: string) => {
 
   return {
     nodes,
-    edges,
+    edges: result,
   };
 };
