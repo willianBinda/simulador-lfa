@@ -8,3 +8,15 @@ B->bB|&
     {A:["aA","&"]},
     {B:["bB","&"]},
 ]
+
+
+S->aA|bS|cS
+A->aA|bS|cB
+B->aB|bB|cB|&
+
+
+nao deterministico
+
+S->aA|bB|aS
+A->aS|bA|&
+B->aB|bS

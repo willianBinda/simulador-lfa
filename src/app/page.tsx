@@ -6,22 +6,36 @@ import { validarGramatica } from "@/utils/index";
 import "./global.css";
 import Graph from "@/components/grafo";
 import { geraGrafo } from "@/utils/grafo";
-import { GrafoType } from "@/types";
+import { GR, GrafoType } from "@/types";
+import AFN from "@/components/afn";
+import { geraTabela } from "@/utils/tabela";
 
 export default function Home() {
-  const [rules, setRules] = useState("S->aA|bB\nA->aA|&\nB->bB|&");
-  const [entrada, setEntrada] = useState("aaaa");
+  const [rules, setRules] = useState("S->aA|bB|aS\nA->aS|bA|&\nB->aB|bS");
+  const [entrada, setEntrada] = useState("a");
+  const [af, setAF] = useState("");
   const [resultado, setResultado] = useState<boolean | null>(null);
   const [dadosGrafo, setDadosGrafo] = useState<GrafoType>({
     edges: [],
     nodes: [],
   });
 
+  const [dadosTabela, setDadosTabela] = useState<{
+    gramatica: GR[];
+    terminais: string[];
+  }>({
+    gramatica: [],
+    terminais: [],
+  });
+
   const handleSimulate = () => {
     try {
-      validarGramatica(rules, entrada);
+      const tipoAF = validarGramatica(rules, entrada);
+      setAF(tipoAF);
       setResultado(true);
       const data: GrafoType = geraGrafo(rules);
+      const data2 = geraTabela(rules);
+      setDadosTabela(data2);
       setDadosGrafo(data);
     } catch (error) {
       console.log(error);
@@ -90,10 +104,30 @@ export default function Home() {
             </ListGroup>
           </div>
         </Col>
+
         {resultado === true ? (
-          <Col className="mt-3">
+          <Col className="mt-3" xs={12}>
+            <Form.Label>Grafo</Form.Label>
             <Graph edges={dadosGrafo.edges} nodes={dadosGrafo.nodes} />
           </Col>
+        ) : null}
+
+        {resultado === true && af === "AFN" ? (
+          <>
+            <Col className="mt-3">
+              <Form.Label>AFN</Form.Label>
+              <AFN
+                gramatica={dadosTabela.gramatica}
+                terminais={dadosTabela.terminais}
+              />
+            </Col>
+
+            {/* <Col className="mt-3">
+              <Form.Label>AFD</Form.Label>
+
+              <AFN />
+            </Col> */}
+          </>
         ) : null}
       </Row>
     </div>

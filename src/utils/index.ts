@@ -1,6 +1,4 @@
-interface GR {
-  [key: string]: string[];
-}
+import { GR } from "@/types";
 
 const terminaComEdison = (gr: GR[], naoTerminalAtual: string) => {
   const regraEncontrada = gr.find((obj) =>
@@ -37,6 +35,27 @@ function procuraOpcao(options: string[], searchTerm: string) {
   return found;
 }
 
+const isDeterministico = (gr: GR[]) => {
+  for (const el of gr) {
+    const chave = Object.keys(el)[0];
+    const opcoesComDois = el[chave].filter((itens) => itens.length === 2);
+
+    for (const e of opcoesComDois) {
+      const t = e.split("")[0];
+      const qtde = opcoesComDois
+        .join("")
+        .split("")
+        .filter((item) => item === t).length;
+
+      if (qtde === 2) {
+        return "AFN";
+      }
+    }
+  }
+
+  return "AFD";
+};
+
 export const validarGramatica = (gr: string, entrada: string) => {
   const gramatica = gr.split("\n");
 
@@ -46,7 +65,8 @@ export const validarGramatica = (gr: string, entrada: string) => {
       [naoTerminal]: gramatica[index].split(naoTerminal + "->")[1].split("|"),
     };
   });
-
+  // const deteministico = isDeterministico(novaGramatica);
+  // console.log("Gramatica é: ", deteministico);
   // eslint-disable-next-line
   let naoTerminalAtual = "S";
 
@@ -105,4 +125,6 @@ export const validarGramatica = (gr: string, entrada: string) => {
       }
     }
   });
+
+  return isDeterministico(novaGramatica);
 };
