@@ -23,9 +23,11 @@ export default function Home() {
   const [dadosTabela, setDadosTabela] = useState<{
     gramatica: GR[];
     terminais: string[];
+    estadoAceitacao: string[];
   }>({
     gramatica: [],
     terminais: [],
+    estadoAceitacao: [],
   });
 
   const handleSimulate = () => {
@@ -111,22 +113,17 @@ export default function Home() {
             <Graph edges={dadosGrafo.edges} nodes={dadosGrafo.nodes} />
           </Col>
         ) : null}
-
-        {resultado === true && af === "AFN" ? (
+        {/* {resultado === true && af === "AFN" ? ( */}
+        {resultado === true ? (
           <>
             <Col className="mt-3">
               <Form.Label>AFN</Form.Label>
               <AFN
                 gramatica={dadosTabela.gramatica}
                 terminais={dadosTabela.terminais}
+                estadoAceitacao={dadosTabela.estadoAceitacao}
               />
             </Col>
-
-            {/* <Col className="mt-3">
-              <Form.Label>AFD</Form.Label>
-
-              <AFN />
-            </Col> */}
           </>
         ) : null}
       </Row>

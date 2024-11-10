@@ -33,7 +33,7 @@ export const geraTabela = (rules: string) => {
 
       const [t, nt] = el.split("");
       const indexOfTerminal = terminais.findIndex((nt) => nt === t);
-      // console.log("naoTerminal: ", nt);
+      // console.log("naoTerminal: ", nt, indexOfTerminal);
       if (indexOfTerminal >= 0) {
         if (dados[indexOfTerminal]) {
           dados[indexOfTerminal] = dados[indexOfTerminal] + "," + nt;
@@ -53,10 +53,21 @@ export const geraTabela = (rules: string) => {
   });
 
   // console.log("resultado: ", a);
-  const estadoInicial: string[] = [];
   const estadoAceitacao: string[] = [];
-  console.log(estadoInicial);
-  console.log(estadoAceitacao);
+  // console.log(estadoAceitacao);
 
-  return { gramatica: a, terminais };
+  novaGramatica.forEach((e) => {
+    // console.log(Object.keys(e)[0]);
+    Object.values(e).forEach((el) => {
+      // console.log(el);
+      el.forEach((item) => {
+        if (item.length === 1) {
+          // console.log("solo: ", item, " chave: ", Object.keys(e)[0]);
+          estadoAceitacao.push(Object.keys(e)[0]);
+        }
+      });
+    });
+  });
+
+  return { gramatica: a, terminais, estadoAceitacao };
 };

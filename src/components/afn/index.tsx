@@ -6,8 +6,9 @@ import { Table } from "react-bootstrap";
 interface Props {
   gramatica: GR[];
   terminais: string[];
+  estadoAceitacao: string[];
 }
-export default function AFN({ gramatica, terminais }: Props) {
+export default function AFN({ gramatica, terminais, estadoAceitacao }: Props) {
   return (
     <>
       <Table striped bordered className="text-center">
@@ -31,15 +32,13 @@ export default function AFN({ gramatica, terminais }: Props) {
                   {valores.map((val, i) => (
                     <td key={i}>{val}</td>
                   ))}
-                  {/* <td>[A,S]</td>
-                  <td>B</td> */}
                 </tr>
               );
             }
-
+            const isAceitacao = estadoAceitacao.includes(chave);
             return (
               <tr key={index}>
-                <th></th>
+                <th>{isAceitacao ? "*" : null}</th>
                 <th>{chave}</th>
                 {valores.map((val, i) => (
                   <td key={i}>{val}</td>
@@ -47,31 +46,6 @@ export default function AFN({ gramatica, terminais }: Props) {
               </tr>
             );
           })}
-
-          {/* <tr>
-            <th></th>
-            <th>$</th>
-            <th>a</th>
-            <th>b</th>
-          </tr>
-          <tr>
-            <th>{"->"}</th>
-            <th>S</th>
-            <td>[A,S]</td>
-            <td>B</td>
-          </tr>
-          <tr>
-            <th>*</th>
-            <th>A</th>
-            <td>S</td>
-            <td>A</td>
-          </tr>
-          <tr>
-            <td></td>
-            <th>B</th>
-            <td>B</td>
-            <td>S</td>
-          </tr> */}
         </tbody>
       </Table>
     </>
