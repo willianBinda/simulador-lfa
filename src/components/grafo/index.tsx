@@ -12,10 +12,10 @@ export default function Graph({ nodes, edges }: GrafoType) {
 
     const options = {
       nodes: {
-        shape: "dot",
+        shape: "circle",
         size: 20,
         font: {
-          size: 15,
+          size: 20,
           color: "#000",
         },
         color: {

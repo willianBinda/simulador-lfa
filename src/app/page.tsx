@@ -21,7 +21,7 @@ export default function Home() {
     try {
       validarGramatica(rules, entrada);
       setResultado(true);
-      const data: GrafoType = geraGrafo();
+      const data: GrafoType = geraGrafo(rules);
       setDadosGrafo(data);
     } catch (error) {
       console.log(error);
