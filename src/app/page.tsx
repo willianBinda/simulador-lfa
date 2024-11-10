@@ -27,8 +27,7 @@ export default function Home() {
     } else if (resultado === false) {
       return (
         <Alert variant="danger">
-          String de entrada não aceita! Verifique sua gramática ou sua string de
-          entrada!
+          String de entrada não aceita! Verifique sua gramática!
         </Alert>
       );
     } else return null;
