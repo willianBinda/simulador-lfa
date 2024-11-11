@@ -126,6 +126,19 @@ export default function Home() {
             </Col>
           </>
         ) : null}
+
+        {/* {resultado === true && af === "AFN" ? (
+          <>
+            <Col className="mt-3">
+              <Form.Label>AFN</Form.Label>
+              <AFN
+                gramatica={dadosTabela.gramatica}
+                terminais={dadosTabela.terminais}
+                estadoAceitacao={dadosTabela.estadoAceitacao}
+              />
+            </Col>
+          </>
+        ) : null} */}
       </Row>
     </div>
   );

@@ -1,3 +1,5 @@
+import { GR } from "@/types";
+
 export const geraTabela = (rules: string) => {
   const gramatica = rules.split("\n");
 
@@ -24,7 +26,7 @@ export const geraTabela = (rules: string) => {
 
   // console.log("terminais: ", terminais);
   // console.log("gr: ", novaGramatica);
-  const a = novaGramatica.map((item) => {
+  const afn = novaGramatica.map((item) => {
     // console.log(item);
     // console.log(Object.keys(item));
     const dados: string[] = new Array(terminais.length);
@@ -54,6 +56,72 @@ export const geraTabela = (rules: string) => {
     };
   });
 
+  console.log("afn: ", afn);
+
+  const afd: GR[] = [];
+  afd.push(afn[0]);
+
+  console.log("afd: ", afd);
+  let limite = 50;
+
+  while (true) {
+    //condição de parada
+    if (limite === 0) {
+      break;
+    }
+
+    // console.log(limite);
+
+    limite -= 1;
+
+    const todasAsChaves = afd.map((obj) => Object.keys(obj)[0]);
+    // console.log(todasAsChaves);
+
+    Object.values(afd).forEach((e) => {
+      const chave = Object.keys(e)[0];
+      // console.log(e, chave);
+      e[chave].forEach((el) => {
+        // console.log(el);
+        const exists = todasAsChaves.some(
+          (item) =>
+            item.split(",").sort().join(",") === el.split(",").sort().join(",")
+        );
+        if (!exists) {
+          console.log(e, el);
+          const dados: string[] = new Array(terminais.length);
+
+          const estados = el.split("").filter((item) => item !== ",");
+
+          console.log("estados para verificar: ", estados);
+
+          estados.forEach((est, index) => {
+            console.log("estado unico: ", est);
+            const a = afn.find((estado) => estado[est]);
+            if (a) {
+              console.log("estado encontrado: ", a[est], a[est].length);
+
+              if (dados[index]) {
+                dados[index] = dados[index] + "," + a[est][index];
+              } else {
+                dados[index] = a[est][index];
+              }
+              // a[est].forEach((item) => {
+              //   console.log("item encontrado: ", item);
+              // });
+            }
+          });
+          console.log("***************");
+          console.log("dados: ", dados);
+          console.log("***************");
+          afd.push({
+            [el]: [],
+          });
+        }
+      });
+    });
+  }
+  console.log("resultado: ", afd);
+
   // console.log("resultado: ", a);
   const estadoAceitacao: string[] = [];
   // console.log(estadoAceitacao);
@@ -71,5 +139,5 @@ export const geraTabela = (rules: string) => {
     });
   });
 
-  return { gramatica: a, terminais, estadoAceitacao };
+  return { gramatica: afn, terminais, estadoAceitacao };
 };
