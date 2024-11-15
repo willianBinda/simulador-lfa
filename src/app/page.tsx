@@ -26,11 +26,15 @@ export default function Home() {
     terminais: string[];
     estadoAceitacao: string[];
     afd: GR[];
+    novoAFD: GR[];
+    estadoAceitacaoNovaAFD: string[];
   }>({
     gramatica: [],
     terminais: [],
     estadoAceitacao: [],
     afd: [],
+    novoAFD: [],
+    estadoAceitacaoNovaAFD: [],
   });
 
   const handleSimulate = () => {
@@ -138,6 +142,8 @@ export default function Home() {
                 gramatica={dadosTabela.afd}
                 terminais={dadosTabela.terminais}
                 estadoAceitacao={dadosTabela.estadoAceitacao}
+                novoAFD={dadosTabela.novoAFD}
+                estadoAceitacaoNovaAFD={dadosTabela.estadoAceitacaoNovaAFD}
               />
             </Col>
           </>
