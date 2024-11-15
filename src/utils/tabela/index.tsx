@@ -56,12 +56,13 @@ export const geraTabela = (rules: string) => {
     };
   });
 
-  console.log("afn: ", afn);
+  // console.log("afn: ", afn);
 
   const afd: GR[] = [];
   afd.push(afn[0]);
+  // afd.push(afn[1]);
 
-  console.log("afd: ", afd);
+  // console.log("afd: ", afd);
   let limite = 50;
 
   while (true) {
@@ -69,58 +70,108 @@ export const geraTabela = (rules: string) => {
     if (limite === 0) {
       break;
     }
-
-    // console.log(limite);
-
     limite -= 1;
-
-    const todasAsChaves = afd.map((obj) => Object.keys(obj)[0]);
-    // console.log(todasAsChaves);
+    const chaves = afd.map((obj) => Object.keys(obj)[0]);
+    // console.log("chaves: ", chaves);
 
     Object.values(afd).forEach((e) => {
       const chave = Object.keys(e)[0];
-      // console.log(e, chave);
       e[chave].forEach((el) => {
-        // console.log(el);
-        const exists = todasAsChaves.some(
+        // console.log("e[chave]: ", e[chave]);
+        const existsChave = chaves.some(
           (item) =>
             item.split(",").sort().join(",") === el.split(",").sort().join(",")
         );
-        if (!exists) {
-          console.log(e, el);
-          const dados: string[] = new Array(terminais.length);
+        // console.log(existsChave);
+        if (!existsChave) {
+          // console.log("não existe chave ainda.");
+          const options = el.split(",");
+          const novoAr: string[] = new Array(terminais.length);
 
-          const estados = el.split("").filter((item) => item !== ",");
+          options.forEach((opt) => {
+            // console.log("opt: ", opt, " index: ", index);
+            // console.log("chaves afn: ", Object.values(afn));
+            Object.values(afn).forEach((afnOpt) => {
+              if (afnOpt[opt]) {
+                // console.log("opt: ", opt);
+                // console.log("afn: ", afnOpt);
+                // console.log("afn opt: ", afnOpt[opt]);
+                // console.log("afn opt com index: ", afnOpt[opt][index]);
+                // console.log("novoArr: ", novoAr);
+                const indexes = terminais.length;
+                for (let i = 0; i < indexes; i++) {
+                  // console.log("afn opt com indice do for: ", afnOpt[opt][i]);
+                  if (novoAr[i]) {
+                    novoAr[i] = novoAr[i] + "," + afnOpt[opt][i];
+                  } else {
+                    novoAr[i] = afnOpt[opt][i];
+                  }
+                }
 
-          console.log("estados para verificar: ", estados);
-
-          estados.forEach((est, index) => {
-            console.log("estado unico: ", est);
-            const a = afn.find((estado) => estado[est]);
-            if (a) {
-              console.log("estado encontrado: ", a[est], a[est].length);
-
-              if (dados[index]) {
-                dados[index] = dados[index] + "," + a[est][index];
-              } else {
-                dados[index] = a[est][index];
+                // console.log("novoArrdepois: ", novoAr);
+                // console.log("------------");
               }
-              // a[est].forEach((item) => {
-              //   console.log("item encontrado: ", item);
-              // });
-            }
+            });
           });
-          console.log("***************");
-          console.log("dados: ", dados);
-          console.log("***************");
+          const resultado = novoAr.map((str) => {
+            // Criar um Set para remover caracteres duplicados e depois juntar de volta em uma string
+            return [...new Set(str.split(","))].join(",");
+          });
+          // console.log("novo arrFinal:", resultado);
+          // console.log("------------");
+          // console.log("primeira: ", p, " segunda: ", s);
           afd.push({
-            [el]: [],
+            [el]: resultado,
           });
         }
       });
     });
+
+    // Object.values(afd).forEach((e) => {
+    //   const chave = Object.keys(e)[0];
+    //   console.log(e, chave);
+    //   e[chave].forEach((el) => {
+    //     // console.log(el);
+    //     const exists = todasAsChaves.some(
+    //       (item) =>
+    //         item.split(",").sort().join(",") === el.split(",").sort().join(",")
+    //     );
+    //     if (!exists) {
+    //       console.log(e, el);
+    //       const dados: string[] = new Array(terminais.length);
+
+    //       const estados = el.split("").filter((item) => item !== ",");
+
+    //       console.log("estados para verificar: ", estados);
+
+    //       estados.forEach((est, index) => {
+    //         console.log("estado unico: ", est);
+    //         const a = afn.find((estado) => estado[est]);
+    //         if (a) {
+    //           console.log("estado encontrado: ", a[est], a[est].length);
+
+    //           if (dados[index]) {
+    //             dados[index] = dados[index] + "," + a[est][index];
+    //           } else {
+    //             dados[index] = a[est][index];
+    //           }
+    //           // a[est].forEach((item) => {
+    //           //   console.log("item encontrado: ", item);
+    //           // });
+    //         }
+    //       });
+    //       console.log("***************");
+    //       console.log("dados: ", dados);
+    //       console.log("***************");
+    //       afd.push({
+    //         [el]: [],
+    //       });
+    //     }
+    //   });
+    // });
+    // console.log("**************");
   }
-  console.log("resultado: ", afd);
+  // console.log("resultado: ", afd);
 
   // console.log("resultado: ", a);
   const estadoAceitacao: string[] = [];
@@ -139,5 +190,5 @@ export const geraTabela = (rules: string) => {
     });
   });
 
-  return { gramatica: afn, terminais, estadoAceitacao };
+  return { gramatica: afn, terminais, estadoAceitacao, afd };
 };

@@ -9,6 +9,7 @@ import { geraGrafo } from "@/utils/grafo";
 import { GR, GrafoType } from "@/types";
 import AFN from "@/components/afn";
 import { geraTabela } from "@/utils/tabela";
+import AFD from "@/components/afd";
 
 export default function Home() {
   const [rules, setRules] = useState("S->aA|bB|aS\nA->aS|bA|&\nB->aB|bS");
@@ -24,10 +25,12 @@ export default function Home() {
     gramatica: GR[];
     terminais: string[];
     estadoAceitacao: string[];
+    afd: GR[];
   }>({
     gramatica: [],
     terminais: [],
     estadoAceitacao: [],
+    afd: [],
   });
 
   const handleSimulate = () => {
@@ -127,18 +130,18 @@ export default function Home() {
           </>
         ) : null}
 
-        {/* {resultado === true && af === "AFN" ? (
+        {resultado === true && af === "AFN" ? (
           <>
             <Col className="mt-3">
-              <Form.Label>AFN</Form.Label>
-              <AFN
-                gramatica={dadosTabela.gramatica}
+              <Form.Label>AFD</Form.Label>
+              <AFD
+                gramatica={dadosTabela.afd}
                 terminais={dadosTabela.terminais}
                 estadoAceitacao={dadosTabela.estadoAceitacao}
               />
             </Col>
           </>
-        ) : null} */}
+        ) : null}
       </Row>
     </div>
   );

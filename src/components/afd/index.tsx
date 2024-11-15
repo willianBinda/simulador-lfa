@@ -8,7 +8,7 @@ interface Props {
   terminais: string[];
   estadoAceitacao: string[];
 }
-export default function AFN({ gramatica, terminais, estadoAceitacao }: Props) {
+export default function AFD({ gramatica, terminais, estadoAceitacao }: Props) {
   return (
     <>
       <Table striped bordered className="text-center">
@@ -28,20 +28,23 @@ export default function AFN({ gramatica, terminais, estadoAceitacao }: Props) {
               return (
                 <tr key={index}>
                   <th>{"->"}</th>
-                  <th>{chave}</th>
+                  <th>[{chave}]</th>
                   {valores.map((val, i) => (
-                    <td key={i}>{val}</td>
+                    <td key={i}>[{val}]</td>
                   ))}
                 </tr>
               );
             }
-            const isAceitacao = estadoAceitacao.includes(chave);
+
+            const isAceitacao = estadoAceitacao.some((letra) =>
+              chave.includes(letra)
+            );
             return (
               <tr key={index}>
                 <th>{isAceitacao ? "*" : null}</th>
-                <th>{chave}</th>
+                <th>[{chave}]</th>
                 {valores.map((val, i) => (
-                  <td key={i}>{val}</td>
+                  <td key={i}>[{val}]</td>
                 ))}
               </tr>
             );
