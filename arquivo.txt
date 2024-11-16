@@ -20,3 +20,11 @@ nao deterministico
 S->aA|bB|aS
 A->aS|bA|&
 B->aB|bS
+
+
+S->aA|bA|cA
+A->aB|bB|cB|1B|2B|3B
+B->aC|bC|cC|1C|2C|3C
+C->aD|bD|cD|1D|2D|3D
+D->aE|bE|cE|1E|2E|3E
+E->1|2|3

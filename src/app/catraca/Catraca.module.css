@@ -1,0 +1,94 @@
+.lista {
+  flex: 1;
+  /* border: 1px solid black; */
+}
+.itemListAceita {
+  background-color: #2bff60;
+  margin: 10px;
+  padding: 10px;
+  border-radius: 10px;
+}
+.itemListNegada {
+  background-color: red;
+  margin: 10px;
+  padding: 10px;
+  border-radius: 10px;
+}
+.main {
+  display: flex;
+}
+.containerRow {
+  display: flex;
+  align-items: flex-start; /* Alinha os itens ao topo da coluna */
+}
+.container {
+  position: relative;
+  width: 500px;
+  height: 200px;
+  overflow: hidden;
+  /* border: 1px solid black; */
+}
+
+.catraca {
+  position: absolute;
+  left: 100px;
+  bottom: 20px;
+  width: 200px;
+  height: 100px;
+  display: flex;
+  align-items: flex-end;
+}
+
+.base {
+  width: 20px;
+  height: 80px;
+  background-color: #555;
+  border-radius: 4px;
+  margin-right: -10px;
+  z-index: 2; /* Base da catraca acima do carro */
+}
+
+.bar {
+  width: 150px;
+  height: 15px;
+  background-color: #ff0000;
+  border-radius: 4px;
+  transform-origin: left center;
+  transform: rotate(0deg);
+  transition: transform 1s ease-in-out;
+  position: absolute;
+  left: 20px;
+  bottom: 40px;
+  z-index: 3; /* Barra da catraca acima da base */
+}
+
+.active {
+  transform: rotate(-90deg); /* Levanta a barra em 90 graus */
+}
+
+.car {
+  position: absolute;
+  left: 0px; /* Começa antes da barra preta */
+  bottom: 25px;
+  font-size: 80px; /* Tamanho do ícone do carro */
+  color: black; /* Cor do ícone do carro */
+  transition: transform 3s ease-in-out; /* Mais lento para uma animação suave */
+  z-index: 1; /* O carro começa atrás da catraca */
+}
+
+.carPassing {
+  animation: carCurve 3s ease-in-out forwards; /* Animação de curva */
+  z-index: 1; /* Garante que o carro passe atrás da catraca durante a animação */
+}
+
+@keyframes carCurve {
+  0% {
+    transform: translateX(0px) translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateX(100px) translateY(-40px) rotate(10deg); /* Meio da curva */
+  }
+  100% {
+    transform: translateX(300px) translateY(0) rotate(0deg); /* Final da curva */
+  }
+}
