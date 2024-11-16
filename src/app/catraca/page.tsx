@@ -4,7 +4,8 @@ import styles from "./Catraca.module.css";
 import { IoCar } from "react-icons/io5";
 import { validarGramatica } from "@/utils";
 import { geraEntrada } from "@/utils/catraca";
-import { Col, ListGroup, Row } from "react-bootstrap";
+import { ListGroup } from "react-bootstrap";
+import "bootstrap/dist/css/bootstrap.min.css";
 
 export default function Catraca() {
   const [active, setActive] = useState(false);
@@ -36,8 +37,8 @@ export default function Catraca() {
       setEntradaList((prevEntradaList) => {
         const updatedList =
           prevEntradaList.length === 10
-            ? [...prevEntradaList.slice(1), novaEntrada]
-            : [...prevEntradaList, novaEntrada];
+            ? [novaEntrada, ...prevEntradaList.slice(0, -1)]
+            : [novaEntrada, ...prevEntradaList];
         return updatedList;
       });
 
@@ -64,9 +65,12 @@ export default function Catraca() {
   }, []);
 
   return (
-    <div className={styles.container}>
-      <Row className={styles.containerRow}>
-        <Col md={6}>
+    <>
+      <h1 className={styles.header}>Sistema de catraca</h1>
+
+      <div className={styles.containerRow}>
+        <div>
+          <h5 className={styles.header}>Animação</h5>
           <div className={styles.containerCatraca}>
             <div className={styles.catraca}>
               <div
@@ -74,6 +78,7 @@ export default function Catraca() {
               ></div>
               <div className={styles.base}></div>
             </div>
+
             <IoCar
               className={`${styles.car} ${
                 carStatus === "waiting"
@@ -84,24 +89,34 @@ export default function Catraca() {
               }`}
             />
           </div>
-        </Col>
+          <div>
+            <h5 className={styles.header}>Regras</h5>
+            <ListGroup>
+              <ListGroup.Item>{"S->aA|bA|cA"}</ListGroup.Item>
+              <ListGroup.Item>{"A->aB|bB|cB|1B|2B|3B"}</ListGroup.Item>
+              <ListGroup.Item>{"B->aC|bC|cC|1C|2C|3C"}</ListGroup.Item>
+              <ListGroup.Item>{"C->aD|bD|cD|1D|2D|3D"}</ListGroup.Item>
+              <ListGroup.Item>{"D->aE|bE|cE|1E|2E|3E"}</ListGroup.Item>
+              <ListGroup.Item>{"E->1|2|3"}</ListGroup.Item>
+            </ListGroup>
+          </div>
+        </div>
 
-        <Col md={6} className={styles.lista}>
+        <div className={styles.containerList}>
+          <h5 className={styles.header}>Situações</h5>
+
           <ListGroup>
             {entradaList.map((entrada, index) => (
-              <ListGroup.Item
-                key={index}
-                className={
-                  entrada.valido ? styles.itemListAceita : styles.itemListNegada
-                }
-              >
-                Acesso {entrada.valido ? "permitido!" : "negado!"} Placa:{" "}
-                {entrada.entrada}
+              <ListGroup.Item key={index} className="container">
+                <div className={entrada.valido ? styles.accept : styles.deny}>
+                  Acesso {entrada.valido ? "permitido!" : "negado!"} Placa:{" "}
+                  {entrada.entrada}
+                </div>
               </ListGroup.Item>
             ))}
           </ListGroup>
-        </Col>
-      </Row>
-    </div>
+        </div>
+      </div>
+    </>
   );
 }
