@@ -1,37 +1,13 @@
-.lista {
-  flex: 1;
-  /* border: 1px solid black; */
-}
-.itemListAceita {
-  background-color: #2bff60;
-  margin: 10px;
-  padding: 10px;
-  border-radius: 10px;
-}
-.itemListNegada {
-  background-color: red;
-  margin: 10px;
-  padding: 10px;
-  border-radius: 10px;
-}
-.main {
-  display: flex;
-}
-.containerRow {
-  display: flex;
-  align-items: flex-start; /* Alinha os itens ao topo da coluna */
-}
-.container {
+.containerCatraca {
   position: relative;
   width: 500px;
   height: 200px;
   overflow: hidden;
-  /* border: 1px solid black; */
 }
 
 .catraca {
   position: absolute;
-  left: 100px;
+  left: 200px;
   bottom: 20px;
   width: 200px;
   height: 100px;
@@ -45,7 +21,7 @@
   background-color: #555;
   border-radius: 4px;
   margin-right: -10px;
-  z-index: 2; /* Base da catraca acima do carro */
+  z-index: 2;
 }
 
 .bar {
@@ -59,36 +35,46 @@
   position: absolute;
   left: 20px;
   bottom: 40px;
-  z-index: 3; /* Barra da catraca acima da base */
+  z-index: 3;
 }
 
 .active {
-  transform: rotate(-90deg); /* Levanta a barra em 90 graus */
+  transform: rotate(-90deg);
 }
 
 .car {
   position: absolute;
-  left: 0px; /* Começa antes da barra preta */
   bottom: 25px;
-  font-size: 80px; /* Tamanho do ícone do carro */
-  color: black; /* Cor do ícone do carro */
-  transition: transform 3s ease-in-out; /* Mais lento para uma animação suave */
-  z-index: 1; /* O carro começa atrás da catraca */
+  font-size: 80px;
+  color: black;
+  transition: transform 3s ease-in-out;
+  z-index: 1;
 }
 
+/* Posição inicial fora da tela */
+.carOffscreen {
+  transform: translateX(-100%);
+}
+
+/* Posição de espera em frente à catraca */
+.carWaiting {
+  transform: translateX(120px); /* Ajuste para parar em frente à catraca */
+  transition: transform 2s ease-in-out;
+}
+
+/* Passando pela catraca */
 .carPassing {
-  animation: carCurve 3s ease-in-out forwards; /* Animação de curva */
-  z-index: 1; /* Garante que o carro passe atrás da catraca durante a animação */
+  animation: carCurve 3s ease-in-out forwards;
 }
 
 @keyframes carCurve {
   0% {
-    transform: translateX(0px) translateY(0) rotate(0deg);
+    transform: translateX(120px) translateY(0) rotate(0deg);
   }
   50% {
-    transform: translateX(100px) translateY(-40px) rotate(10deg); /* Meio da curva */
+    transform: translateX(220px) translateY(-20px) rotate(10deg);
   }
   100% {
-    transform: translateX(300px) translateY(0) rotate(0deg); /* Final da curva */
+    transform: translateX(400px) translateY(0) rotate(0deg);
   }
 }

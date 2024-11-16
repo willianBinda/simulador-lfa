@@ -8,8 +8,9 @@ import { Col, ListGroup, Row } from "react-bootstrap";
 
 export default function Catraca() {
   const [active, setActive] = useState(false);
-  const [carPassing, setCarPassing] = useState(false);
-  const [carVisible, setCarVisible] = useState(true);
+  const [carStatus, setCarStatus] = useState<
+    "offscreen" | "waiting" | "passing"
+  >("offscreen");
   const [entradaList, setEntradaList] = useState<
     { entrada: string; valido: boolean }[]
   >([]);
@@ -21,14 +22,17 @@ export default function Catraca() {
       const entrada = geraEntrada();
       let isPermitido = false;
 
+      setCarStatus("waiting"); // Carro inicia e para na frente da catraca
+      await new Promise((resolve) => setTimeout(resolve, 2000)); // Tempo para o carro chegar à catraca
+
       try {
         validarGramatica(gr, entrada);
         isPermitido = true;
       } catch (error) {
-        console.log(error);
+        console.log("Acesso negado:", error);
       }
 
-      const novaEntrada = { entrada: entrada, valido: isPermitido };
+      const novaEntrada = { entrada, valido: isPermitido };
       setEntradaList((prevEntradaList) => {
         const updatedList =
           prevEntradaList.length === 10
@@ -38,29 +42,19 @@ export default function Catraca() {
       });
 
       if (isPermitido) {
-        // Inicia a sequência de animação se permitido
-        setActive(true);
-        setCarPassing(true);
+        setActive(true); // Levanta a catraca
+        setCarStatus("passing"); // Carro passa pela catraca
 
-        // Espera 3 segundos antes de esconder o carro e fechar a catraca
+        // Espera até o carro passar (3 segundos) e fecha a catraca
         await new Promise((resolve) => setTimeout(resolve, 3000));
-        setCarPassing(false);
-        setCarVisible(false);
-
-        // Aguarda mais 1 segundo para baixar a catraca
-        await new Promise((resolve) => setTimeout(resolve, 1000));
         setActive(false);
-
-        // Aguarda mais 1 segundo antes de reiniciar o ciclo com o carro visível
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        setCarVisible(true);
+        setCarStatus("offscreen"); // Carro sai da tela
       } else {
-        setCarVisible(false);
-        await new Promise((resolve) => setTimeout(resolve, 200));
-        setCarVisible(true);
+        // Acesso negado, carro volta para fora da tela
+        setCarStatus("offscreen");
       }
 
-      // Aguarda um intervalo para evitar execuções contínuas
+      // Aguarda para reiniciar o ciclo
       await new Promise((resolve) => setTimeout(resolve, 3000));
     }
   };
@@ -70,31 +64,28 @@ export default function Catraca() {
   }, []);
 
   return (
-    <div className="container mt-4">
-      <Row className={`${styles.containerRow} d-flex justify-content-center`}>
-        {/* Coluna para animação da catraca */}
-        <Col
-          md={6}
-          className="d-flex justify-content-center align-items-center"
-        >
-          <div className={styles.container}>
+    <div className={styles.container}>
+      <Row className={styles.containerRow}>
+        <Col md={6}>
+          <div className={styles.containerCatraca}>
             <div className={styles.catraca}>
               <div
                 className={`${styles.bar} ${active ? styles.active : ""}`}
               ></div>
               <div className={styles.base}></div>
             </div>
-            {carVisible && (
-              <IoCar
-                className={`${styles.car} ${
-                  carPassing ? styles.carPassing : ""
-                }`}
-              />
-            )}
+            <IoCar
+              className={`${styles.car} ${
+                carStatus === "waiting"
+                  ? styles.carWaiting
+                  : carStatus === "passing"
+                  ? styles.carPassing
+                  : styles.carOffscreen
+              }`}
+            />
           </div>
         </Col>
 
-        {/* Coluna para a lista */}
         <Col md={6} className={styles.lista}>
           <ListGroup>
             {entradaList.map((entrada, index) => (
