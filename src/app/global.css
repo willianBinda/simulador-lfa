@@ -11,3 +11,13 @@
   border: 1px solid #ddd;
   border-radius: 8px;
 }
+
+.listC {
+  flex: 1;
+  /* border: 1px solid black; */
+}
+
+.listaContainer {
+  /* border: 1px solid black; */
+  flex: 1;
+}

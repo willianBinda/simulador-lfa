@@ -102,14 +102,49 @@ export default function Home() {
           md={6}
           className="d-flex align-items-center justify-content-center"
         >
-          <div>
+          <div className="listaContainer">
+            <Form.Label>Ajuda</Form.Label>
+
             <ListGroup horizontal={"sm"} className="my-2">
               <ListGroup.Item>S</ListGroup.Item>
-              <ListGroup.Item>Estado inicial</ListGroup.Item>
+              <ListGroup.Item className="listC">Estado inicial</ListGroup.Item>
+            </ListGroup>
+
+            <ListGroup horizontal={"sm"} className="my-2">
+              <ListGroup.Item>&</ListGroup.Item>
+              <ListGroup.Item className="listC">Estado final</ListGroup.Item>
+            </ListGroup>
+
+            <ListGroup horizontal={"sm"} className="my-2">
+              <ListGroup.Item>|</ListGroup.Item>
+              <ListGroup.Item className="listC">
+                Utilizado para separar as opções das regras
+              </ListGroup.Item>
+            </ListGroup>
+
+            <ListGroup horizontal={"sm"} className="my-2">
+              <ListGroup.Item>Ex: (a,b,1,...)</ListGroup.Item>
+              <ListGroup.Item className="listC">
+                Estados terminais devem estar em lowercase
+              </ListGroup.Item>
+            </ListGroup>
+
+            <ListGroup horizontal={"sm"} className="my-2">
+              <ListGroup.Item>Ex: (A,B,...)</ListGroup.Item>
+              <ListGroup.Item className="listC">
+                Estados não terminais devem estar em uppercase
+              </ListGroup.Item>
+            </ListGroup>
+
+            <ListGroup horizontal={"sm"} className="my-2">
+              <ListGroup.Item className="listC">
+                Cada linha deve conter uma regra da gramática
+              </ListGroup.Item>
             </ListGroup>
             <ListGroup horizontal={"sm"} className="my-2">
-              <ListGroup.Item>& </ListGroup.Item>
-              <ListGroup.Item>Estado final</ListGroup.Item>
+              <ListGroup.Item className="listC">
+                Não devem conter espaços entre as regras ou símbolos
+              </ListGroup.Item>
             </ListGroup>
           </div>
         </Col>
