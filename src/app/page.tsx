@@ -8,12 +8,18 @@ import Graph from "@/components/grafo";
 import { geraGrafo } from "@/utils/grafo";
 import { GR, GrafoType } from "@/types";
 import AFN from "@/components/afn";
-import { geraTabela } from "@/utils/tabela";
+import {
+  geraDadosAFD,
+  geraDadosAFN,
+  geraNovaGR,
+  getEstadosAceitacao,
+  getTerminais,
+} from "@/utils/tabela";
 import AFD from "@/components/afd";
 
 export default function Home() {
-  const [rules, setRules] = useState("S->aA|bB|aS\nA->aS|bA|&\nB->aB|bS");
-  const [entrada, setEntrada] = useState("a");
+  const [rules, setRules] = useState("S->aS|aA|bB\nA->aS|bA|&\nB->aB|bS");
+  const [entrada, setEntrada] = useState("aaa");
   const [af, setAF] = useState("");
   const [resultado, setResultado] = useState<boolean | null>(null);
   const [dadosGrafo, setDadosGrafo] = useState<GrafoType>({
@@ -42,13 +48,42 @@ export default function Home() {
       const tipoAF = validarGramatica(rules, entrada);
       setAF(tipoAF);
       setResultado(true);
+    } catch (error) {
+      console.log("erro validação: ", error);
+      setResultado(false);
+    }
+
+    try {
       const data: GrafoType = geraGrafo(rules);
-      const data2 = geraTabela(rules);
-      setDadosTabela(data2);
       setDadosGrafo(data);
     } catch (error) {
-      console.log(error);
-      setResultado(false);
+      console.log("erro no grafo: ", error);
+    }
+
+    const novaGR = geraNovaGR(rules);
+    const terminaisGR = getTerminais(novaGR);
+
+    try {
+      const afn = geraDadosAFN(novaGR, terminaisGR);
+      console.log("gerou afn");
+      const { chaveMap, novoAFD, afd } = geraDadosAFD(afn, terminaisGR);
+      console.log("gerou afd");
+      const { estadoAceitacao, estadoAceitacaoAFD } = getEstadosAceitacao(
+        novaGR,
+        chaveMap
+      );
+      console.log("gerou estados aceitacao");
+
+      setDadosTabela({
+        gramatica: afn,
+        afd: afd,
+        terminais: terminaisGR,
+        novoAFD,
+        estadoAceitacao,
+        estadoAceitacaoNovaAFD: estadoAceitacaoAFD,
+      });
+    } catch (error) {
+      console.log("erro tabela: ", error);
     }
   };
 
