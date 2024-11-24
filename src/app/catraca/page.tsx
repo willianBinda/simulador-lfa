@@ -68,11 +68,10 @@ export default function Catraca() {
 
   return (
     <>
-      <h1 className={styles.header}>Sistema de catraca</h1>
+      <h1 className={styles.header}>Controle de Acesso - Catraca</h1>
 
       <div className={styles.containerRow}>
         <div>
-          <h5 className={styles.header}>Animação</h5>
           <div className={styles.containerCatraca}>
             <div className={styles.catraca}>
               <div
@@ -105,8 +104,6 @@ export default function Catraca() {
         </div>
 
         <div className={styles.containerList}>
-          <h5 className={styles.header}>Situações</h5>
-
           <ListGroup>
             {entradaList.map((entrada, index) => (
               <ListGroup.Item key={index} className="container">

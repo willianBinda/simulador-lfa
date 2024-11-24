@@ -9,6 +9,9 @@
 }
 
 .containerCatraca {
+  background-image: url("https://cdludi.org.br/wp-content/uploads/2021/10/estacionamentos.jpg");
+  background-size: cover; /* Faz a imagem cobrir todo o contêiner */
+  background-position: center; /* Centraliza a imagem */
   position: relative;
   width: 500px;
   height: 200px;
