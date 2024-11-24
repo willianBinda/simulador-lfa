@@ -2,42 +2,7 @@ export interface GR {
   [key: string]: string[];
 }
 
-// const terminaComEdison = (gr: GR[], naoTerminalAtual: string) => {
-//   const regraEncontrada = gr.find((obj) =>
-//     obj.hasOwnProperty(naoTerminalAtual)
-//   );
-
-//   if (regraEncontrada) {
-//     const options = regraEncontrada[naoTerminalAtual];
-
-//     const optionEncontrada = options.find((opt) => opt === "&");
-
-//     if (optionEncontrada) {
-//       return true;
-//     } else {
-//       throw new Error("Entrada invalida!");
-//     }
-//   } else {
-//     throw new Error(
-//       "nao terminal não foi encontrado na utlima verificação de terminação"
-//     );
-//   }
-// };
-
-// function procuraOpcao(options: string[], searchTerm: string) {
-//   // Primeiro tenta encontrar o caractere exato
-//   let found = options.find((element) => element === searchTerm);
-
-//   // Se não encontrar, tenta com regex
-//   if (!found) {
-//     const regex = new RegExp(`^${searchTerm}`); // Busca por strings que começam com o searchTerm
-//     found = options.find((element) => regex.test(element));
-//   }
-
-//   return found;
-// }
-
-const isDeterministico = (gr: GR[]) => {
+export const isDeterministico = (gr: GR[]) => {
   for (const el of gr) {
     const chave = Object.keys(el)[0];
     const opcoesComDois = el[chave].filter((itens) => itens.length === 2);
@@ -58,19 +23,24 @@ const isDeterministico = (gr: GR[]) => {
   return "AFD";
 };
 
-const buscaOpcao = (nT: string, novaGramatica: GR[], char: string) => {
-  // console.log("Nao terminal na função de busca: ", nT);
-  const regraEncontrada = novaGramatica.find((obj) => obj.hasOwnProperty(nT));
+const verificaOpcao = (
+  nT: string,
+  gr: GR[],
+  char: string,
+  sucessor: string
+) => {
+  const regraEncontrada = encontraRegra(gr, nT);
+  console.log("regra for: ", regraEncontrada);
   if (regraEncontrada) {
-    // console.log(
-    //   "RegraEncontrada na função de busca: ",
-    //   regraEncontrada
-    // );
-    const ooo = regraEncontrada[nT];
-    // console.log("Opções na função de busca: ", ooo);
-    // console.log("CHar na função de busca: ", char);
-    const op = ooo.filter((e) => e.startsWith(char));
-    if (op.length > 0) {
+    const opcoes = regraEncontrada[nT];
+    console.log("NT: ", nT);
+    console.log("opções: ", opcoes);
+    console.log("atual: ", char);
+    console.log("sucessor: ", sucessor);
+    const opcao = opcoes.filter((e) => e.startsWith(char));
+    const opcao2 = opcoes.filter((e) => e.startsWith(sucessor));
+    console.log("Opção escolhida: ", opcao, opcao2);
+    if (opcao.length > 0 && opcao2.length > 0) {
       return true;
     } else {
       return false;
@@ -80,150 +50,109 @@ const buscaOpcao = (nT: string, novaGramatica: GR[], char: string) => {
   }
 };
 
-const buscaOpcaoFinal = (nT: string, novaGramatica: GR[], char: string) => {
-  // console.log("Nao terminal na função de busca: ", nT);
-  const regraEncontrada = novaGramatica.find((obj) => obj.hasOwnProperty(nT));
-
+const verificarOpcaoFinal = (nT: string, gr: GR[], char: string) => {
+  console.log("******************");
+  const regraEncontrada = encontraRegra(gr, nT);
+  console.log("regra final: ", regraEncontrada);
   if (regraEncontrada) {
-    console.log("(FInal)RegraEncontrada na função de busca: ", regraEncontrada);
-    const ooo = regraEncontrada[nT];
-    console.log("Opções final na função de busca: ", ooo);
-    // console.log("CHar na função de busca: ", char);
-    //verificar se termina com a ou se termina com edison
-    const op = ooo.find((element) => element === char);
-    // const op = procuraOpcao(ooo, char);
-    if (op) {
+    const opcoes = regraEncontrada[nT];
+    console.log("char final: ", char);
+    console.log("opções final: ", opcoes);
+
+    const opcao = opcoes.find((element) => element === char);
+    console.log("opção final: ", opcao);
+    console.log("nT final: ", nT);
+
+    if (opcao) {
       return true;
     } else {
-      const edisonEncontrado = ooo.find((opt) => opt === "&");
+      const edisonEncontrado = opcoes.find((opt) => opt === "&");
       if (edisonEncontrado) {
         return true;
       } else {
         return false;
+        // throw new Error("opção final nao encontrada.");
       }
     }
-    // console.log("op final: ", op);
-    // if (op.length > 0) {
-    //   return true;
-    // } else {
-    //   return false;
-    // }
   } else {
     return false;
+    // throw new Error("opção final nao encontrada.");
   }
 };
 
-export const validarGramatica = (gr: string, entrada: string) => {
-  const gramatica = gr.split("\n");
+const encontraRegra = (gr: GR[], naoTerminalAtual: string) => {
+  return gr.find((obj) => obj.hasOwnProperty(naoTerminalAtual));
+};
 
-  const novaGramatica = gramatica.map((item, index) => {
-    const naoTerminal = item[0];
-    return {
-      [naoTerminal]: gramatica[index].split(naoTerminal + "->")[1].split("|"),
-    };
-  });
+export const validarGramatica = (gr: GR[], entrada: string) => {
   // eslint-disable-next-line
   let naoTerminalAtual = "S";
 
   if (!entrada.length) {
-    const optionEncontrada = novaGramatica[0]["S"].find((opt) => opt === "&");
+    const encontraEdison = gr[0]["S"].find((opt) => opt === "&");
 
-    if (!optionEncontrada) {
+    if (!encontraEdison) {
       throw new Error("Entrada inválida");
     }
   }
 
   entrada.split("").forEach((char, index) => {
     if (entrada.length - 1 === index) {
-      console.log("***************");
-      console.log("ultimo char");
-      const regraEncontrada = novaGramatica.find((obj) =>
-        obj.hasOwnProperty(naoTerminalAtual)
-      );
-
-      console.log("regra: ", regraEncontrada);
+      const regraEncontrada = encontraRegra(gr, naoTerminalAtual);
 
       if (regraEncontrada) {
         const options = regraEncontrada[naoTerminalAtual];
-        console.log("opções: ", options);
 
-        // const optionEncontrada = procuraOpcao(options, char);
         const opcoes = options.filter((e) => e.startsWith(char));
-        console.log("opts: ", opcoes);
 
         if (opcoes.length > 0) {
+          console.log("opções fnais: ", opcoes);
+          //eslint-disable-next-line
+          const validado = [];
           for (const opcao of opcoes) {
-            console.log("Opção final for: ", opcao);
-
             const nT = opcao.split("")[1];
-            const choseOption = buscaOpcaoFinal(nT, novaGramatica, char);
+            const choseOption = verificarOpcaoFinal(nT, gr, char);
             if (choseOption) {
-              console.log("Opção escolhida: ", nT);
               naoTerminalAtual = nT;
+              validado.push(1);
               break;
             }
+          }
+          if (validado.length === 0) {
+            throw new Error("opção final nao encontrada.");
           }
         } else {
           throw new Error("entrada não encontrada");
         }
-
-        // if (optionEncontrada) {
-        //   if (optionEncontrada.length === 1) {
-        //   } else {
-        //     const naoTerminalRegra = optionEncontrada.split("")[1];
-
-        //     terminaComEdison(novaGramatica, naoTerminalRegra);
-        //   }
-        // } else {
-        //   throw new Error("entrada não encontrada");
-        // }
       } else {
         throw new Error("nao terminal não foi encontrado");
       }
     } else {
-      const regraEncontrada = novaGramatica.find((obj) =>
-        obj.hasOwnProperty(naoTerminalAtual)
-      );
-
-      console.log("regra: ", regraEncontrada);
+      // console.log("atual: ", entrada[index]);
+      // console.log("Sucessor: ", entrada[index + 1]);
+      const regraEncontrada = encontraRegra(gr, naoTerminalAtual);
 
       if (regraEncontrada) {
         const options = regraEncontrada[naoTerminalAtual];
-        console.log("opções: ", options);
-
-        // const searchTerm = char;
-        // const regex = new RegExp(`^${searchTerm}`);
-
-        // const optionEncontrada = options.find((opt) => regex.test(opt));
 
         const opcoes = options.filter((e) => e.startsWith(char));
-        console.log("opts: ", opcoes);
 
         if (opcoes.length > 0) {
           for (const opcao of opcoes) {
             const nT = opcao.split("")[1];
-            const choseOption = buscaOpcao(nT, novaGramatica, char);
+            const choseOption = verificaOpcao(nT, gr, char, entrada[index + 1]);
             if (choseOption) {
-              console.log("Opção escolhida: ", nT);
               naoTerminalAtual = nT;
+              // console.log("opção escolhida: ", nT);
               break;
             }
           }
         } else {
           throw new Error("entrada não encontrada");
         }
-
-        // if (optionEncontrada) {
-        //   const naoTerminalRegra = optionEncontrada.split("")[1];
-        //   naoTerminalAtual = naoTerminalRegra;
-        // } else {
-        //   throw new Error("entrada não encontrada");
-        // }
       } else {
         throw new Error("nao terminal não foi encontrado");
       }
     }
   });
-
-  return isDeterministico(novaGramatica);
 };

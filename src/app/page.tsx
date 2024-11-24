@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { Alert, Button, Col, Form, ListGroup, Row } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { validarGramatica } from "@/utils/index";
+import { isDeterministico, validarGramatica } from "@/utils/index";
 import "./global.css";
 import Graph from "@/components/grafo";
 import { geraGrafo } from "@/utils/grafo";
@@ -44,9 +44,12 @@ export default function Home() {
   });
 
   const handleSimulate = () => {
+    const novaGR = geraNovaGR(rules);
+    const terminaisGR = getTerminais(novaGR);
+
     try {
-      const tipoAF = validarGramatica(rules, entrada);
-      setAF(tipoAF);
+      validarGramatica(novaGR, entrada);
+      setAF(isDeterministico(novaGR));
       setResultado(true);
     } catch (error) {
       console.log("erro validação: ", error);
@@ -60,19 +63,16 @@ export default function Home() {
       console.log("erro no grafo: ", error);
     }
 
-    const novaGR = geraNovaGR(rules);
-    const terminaisGR = getTerminais(novaGR);
-
     try {
       const afn = geraDadosAFN(novaGR, terminaisGR);
-      console.log("gerou afn");
+      // console.log("gerou afn");
       const { chaveMap, novoAFD, afd } = geraDadosAFD(afn, terminaisGR);
-      console.log("gerou afd");
+      // console.log("gerou afd");
       const { estadoAceitacao, estadoAceitacaoAFD } = getEstadosAceitacao(
         novaGR,
         chaveMap
       );
-      console.log("gerou estados aceitacao");
+      // console.log("gerou estados aceitacao");
 
       setDadosTabela({
         gramatica: afn,
