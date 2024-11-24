@@ -1,41 +1,8 @@
-import { GR } from "@/types";
-
-const terminaComEdison = (gr: GR[], naoTerminalAtual: string) => {
-  const regraEncontrada = gr.find((obj) =>
-    obj.hasOwnProperty(naoTerminalAtual)
-  );
-
-  if (regraEncontrada) {
-    const options = regraEncontrada[naoTerminalAtual];
-
-    const optionEncontrada = options.find((opt) => opt === "&");
-
-    if (optionEncontrada) {
-      return true;
-    } else {
-      throw new Error("Entrada invalida!");
-    }
-  } else {
-    throw new Error(
-      "nao terminal não foi encontrado na utlima verificação de terminação"
-    );
-  }
-};
-
-function procuraOpcao(options: string[], searchTerm: string) {
-  // Primeiro tenta encontrar o caractere exato
-  let found = options.find((element) => element === searchTerm);
-
-  // Se não encontrar, tenta com regex
-  if (!found) {
-    const regex = new RegExp(`^${searchTerm}`); // Busca por strings que começam com o searchTerm
-    found = options.find((element) => regex.test(element));
-  }
-
-  return found;
+export interface GR {
+  [key: string]: string[];
 }
 
-const isDeterministico = (gr: GR[]) => {
+export const isDeterministico = (gr: GR[]) => {
   for (const el of gr) {
     const chave = Object.keys(el)[0];
     const opcoesComDois = el[chave].filter((itens) => itens.length === 2);
@@ -56,75 +23,49 @@ const isDeterministico = (gr: GR[]) => {
   return "AFD";
 };
 
-export const validarGramatica = (gr: string, entrada: string) => {
-  const gramatica = gr.split("\n");
-
-  const novaGramatica = gramatica.map((item, index) => {
-    const naoTerminal = item[0];
-    return {
-      [naoTerminal]: gramatica[index].split(naoTerminal + "->")[1].split("|"),
-    };
-  });
-  // const deteministico = isDeterministico(novaGramatica);
-  // console.log("Gramatica é: ", deteministico);
+export const validarGramatica = (gr: GR[], entrada: string) => {
   // eslint-disable-next-line
   let naoTerminalAtual = "S";
 
-  if (!entrada.length) {
-    const optionEncontrada = novaGramatica[0]["S"].find((opt) => opt === "&");
+  const valida = (copiaEntrada: string, naoTerminal: string): boolean => {
+    const regraEncontrada = encontraRegra(gr, naoTerminal);
+    if (!regraEncontrada) return false;
 
-    if (!optionEncontrada) {
-      throw new Error("Entrada inválida");
+    // Tenta cada produção para o não-terminal atual
+    const options = regraEncontrada[naoTerminal];
+    for (const opcao of options) {
+      // Caso base: se a produção é "&" e a entrada foi totalmente consumida, aceita a entrada
+      if (opcao === "&" && copiaEntrada.length === 0) {
+        return true;
+      }
+
+      // Se a produção corresponde exatamente ao restante da entrada
+      if (opcao === copiaEntrada) {
+        return true;
+      }
+
+      // Verifica se a produção começa com o próximo caractere da entrada
+      if (opcao[0] === copiaEntrada[0]) {
+        const proximoNaoTerminal = opcao[1]; // Segundo caractere na produção
+        const novaEntrada = copiaEntrada.slice(1); // Remove o primeiro caractere da entrada
+
+        // Recursão com o próximo caractere e não-terminal
+        if (valida(novaEntrada, proximoNaoTerminal)) {
+          return true;
+        }
+      }
     }
+    return false; // Retorna falso se nenhuma opção levou a uma solução
+  };
+
+  if (valida(entrada, naoTerminalAtual)) {
+    console.log("A entrada é aceita pela gramática.");
+  } else {
+    throw new Error("Entrada não foi aceita pela gramática.");
   }
+};
 
-  entrada.split("").forEach((char, index) => {
-    if (entrada.length - 1 === index) {
-      const regraEncontrada = novaGramatica.find((obj) =>
-        obj.hasOwnProperty(naoTerminalAtual)
-      );
-
-      if (regraEncontrada) {
-        const options = regraEncontrada[naoTerminalAtual];
-
-        const optionEncontrada = procuraOpcao(options, char);
-
-        if (optionEncontrada) {
-          if (optionEncontrada.length === 1) {
-          } else {
-            const naoTerminalRegra = optionEncontrada.split("")[1];
-
-            terminaComEdison(novaGramatica, naoTerminalRegra);
-          }
-        } else {
-          throw new Error("entrada não encontrada");
-        }
-      } else {
-        throw new Error("nao terminal não foi encontrado");
-      }
-    } else {
-      const regraEncontrada = novaGramatica.find((obj) =>
-        obj.hasOwnProperty(naoTerminalAtual)
-      );
-
-      if (regraEncontrada) {
-        const options = regraEncontrada[naoTerminalAtual];
-
-        const searchTerm = char;
-        const regex = new RegExp(`^${searchTerm}`);
-
-        const optionEncontrada = options.find((opt) => regex.test(opt));
-        if (optionEncontrada) {
-          const naoTerminalRegra = optionEncontrada.split("")[1];
-          naoTerminalAtual = naoTerminalRegra;
-        } else {
-          throw new Error("entrada não encontrada");
-        }
-      } else {
-        throw new Error("nao terminal não foi encontrado");
-      }
-    }
-  });
-
-  return isDeterministico(novaGramatica);
+// Função auxiliar para encontrar uma regra da gramática
+const encontraRegra = (gr: GR[], naoTerminalAtual: string) => {
+  return gr.find((obj) => obj.hasOwnProperty(naoTerminalAtual));
 };

@@ -6,6 +6,7 @@ import { validarGramatica } from "@/utils";
 import { geraEntrada } from "@/utils/catraca";
 import { ListGroup } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
+import { geraNovaGR } from "@/utils/tabela";
 
 export default function Catraca() {
   const [active, setActive] = useState(false);
@@ -27,7 +28,8 @@ export default function Catraca() {
       await new Promise((resolve) => setTimeout(resolve, 2000)); // Tempo para o carro chegar à catraca
 
       try {
-        validarGramatica(gr, entrada);
+        const novaGR = geraNovaGR(gr);
+        validarGramatica(novaGR, entrada);
         isPermitido = true;
       } catch (error) {
         console.log("Acesso negado:", error);
@@ -66,11 +68,10 @@ export default function Catraca() {
 
   return (
     <>
-      <h1 className={styles.header}>Sistema de catraca</h1>
+      <h1 className={styles.header}>Controle de Acesso - Catraca</h1>
 
       <div className={styles.containerRow}>
         <div>
-          <h5 className={styles.header}>Animação</h5>
           <div className={styles.containerCatraca}>
             <div className={styles.catraca}>
               <div
@@ -103,8 +104,6 @@ export default function Catraca() {
         </div>
 
         <div className={styles.containerList}>
-          <h5 className={styles.header}>Situações</h5>
-
           <ListGroup>
             {entradaList.map((entrada, index) => (
               <ListGroup.Item key={index} className="container">

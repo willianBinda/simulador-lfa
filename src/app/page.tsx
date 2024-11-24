@@ -1,19 +1,34 @@
 "use client";
 import React, { useState } from "react";
-import { Alert, Button, Col, Form, ListGroup, Row } from "react-bootstrap";
+import {
+  Alert,
+  Button,
+  Card,
+  Col,
+  Container,
+  Form,
+  ListGroup,
+  Row,
+} from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { validarGramatica } from "@/utils/index";
+import { isDeterministico, validarGramatica } from "@/utils/index";
 import "./global.css";
 import Graph from "@/components/grafo";
 import { geraGrafo } from "@/utils/grafo";
 import { GR, GrafoType } from "@/types";
 import AFN from "@/components/afn";
-import { geraTabela } from "@/utils/tabela";
+import {
+  geraDadosAFD,
+  geraDadosAFN,
+  geraNovaGR,
+  getEstadosAceitacao,
+  getTerminais,
+} from "@/utils/tabela";
 import AFD from "@/components/afd";
 
 export default function Home() {
-  const [rules, setRules] = useState("S->aA|bB|aS\nA->aS|bA|&\nB->aB|bS");
-  const [entrada, setEntrada] = useState("a");
+  const [rules, setRules] = useState("S->aS|aA|bB\nA->aS|bA|&\nB->aB|bS");
+  const [entrada, setEntrada] = useState("aaa");
   const [af, setAF] = useState("");
   const [resultado, setResultado] = useState<boolean | null>(null);
   const [dadosGrafo, setDadosGrafo] = useState<GrafoType>({
@@ -22,33 +37,59 @@ export default function Home() {
   });
 
   const [dadosTabela, setDadosTabela] = useState<{
-    gramatica: GR[];
+    afn: GR[];
+    oldAFD: GR[];
+    newAFD: GR[];
     terminais: string[];
-    estadoAceitacao: string[];
-    afd: GR[];
-    novoAFD: GR[];
-    estadoAceitacaoNovaAFD: string[];
+    estadoAceitacaoAFN: string[];
+    estadoAceitacaoAFD: string[];
   }>({
-    gramatica: [],
+    afn: [],
+    oldAFD: [],
+    newAFD: [],
     terminais: [],
-    estadoAceitacao: [],
-    afd: [],
-    novoAFD: [],
-    estadoAceitacaoNovaAFD: [],
+    estadoAceitacaoAFN: [],
+    estadoAceitacaoAFD: [],
   });
 
   const handleSimulate = () => {
+    const gr = geraNovaGR(rules);
+    const terminais = getTerminais(gr);
+
     try {
-      const tipoAF = validarGramatica(rules, entrada);
-      setAF(tipoAF);
+      validarGramatica(gr, entrada);
+      setAF(isDeterministico(gr));
       setResultado(true);
-      const data: GrafoType = geraGrafo(rules);
-      const data2 = geraTabela(rules);
-      setDadosTabela(data2);
+    } catch (error) {
+      console.log("erro validação: ", error);
+      setResultado(false);
+    }
+
+    try {
+      const data: GrafoType = geraGrafo(gr);
       setDadosGrafo(data);
     } catch (error) {
-      console.log(error);
-      setResultado(false);
+      console.log("erro no grafo: ", error);
+    }
+
+    try {
+      const afn = geraDadosAFN(gr, terminais);
+      const { chaveMap, oldAFD, newAFD } = geraDadosAFD(afn, terminais);
+      const { estadoAceitacaoAFN, estadoAceitacaoAFD } = getEstadosAceitacao(
+        gr,
+        chaveMap
+      );
+
+      setDadosTabela({
+        afn: afn,
+        oldAFD,
+        newAFD,
+        terminais,
+        estadoAceitacaoAFN,
+        estadoAceitacaoAFD,
+      });
+    } catch (error) {
+      console.log("erro tabela: ", error);
     }
   };
 
@@ -69,121 +110,133 @@ export default function Home() {
   };
 
   return (
-    <div className="container mt-4">
-      <Row className="containerGr">
+    <Container className="mt-4">
+      <h1 className="text-center mb-4">
+        Simulador de Gramática Regular e Autômato Finito
+      </h1>
+
+      <Row>
+        {/* Coluna da entrada de dados */}
         <Col md={6}>
-          <Form>
-            <Form.Label>Gramática</Form.Label>
-            <Form.Group>
-              <Form.Control
-                as="textarea"
-                rows={5}
-                value={rules}
-                placeholder="Digite sua GR aqui..."
-                onChange={(e) => setRules(e.target.value)}
-              />
+          <Card className="p-4 shadow-sm">
+            <Card.Body>
+              <Card.Title>Definir Gramática</Card.Title>
+              <Form>
+                <Form.Group className="mb-3">
+                  <Form.Control
+                    as="textarea"
+                    rows={5}
+                    value={rules}
+                    placeholder="Digite sua GR aqui..."
+                    onChange={(e) => setRules(e.target.value)}
+                  />
+                </Form.Group>
 
-              <Form.Label>String de entrada</Form.Label>
-              <Form.Control
-                placeholder="Digite sua string"
-                value={entrada}
-                onChange={(e) => setEntrada(e.target.value)}
-              />
-            </Form.Group>
+                <Form.Group className="mb-3">
+                  <Form.Label>String de Entrada</Form.Label>
+                  <Form.Control
+                    placeholder="Digite sua string"
+                    value={entrada}
+                    onChange={(e) => setEntrada(e.target.value)}
+                  />
+                </Form.Group>
 
-            <Button onClick={handleSimulate} className="mt-3">
-              Simular
-            </Button>
-          </Form>
+                <Button
+                  variant="primary"
+                  onClick={handleSimulate}
+                  className="w-100"
+                >
+                  Simular
+                </Button>
+              </Form>
+            </Card.Body>
+          </Card>
           {fResultado()}
         </Col>
 
-        <Col
-          md={6}
-          className="d-flex align-items-center justify-content-center"
-        >
-          <div className="listaContainer">
-            <Form.Label>Ajuda</Form.Label>
-
-            <ListGroup horizontal={"sm"} className="my-2">
-              <ListGroup.Item>S</ListGroup.Item>
-              <ListGroup.Item className="listC">Estado inicial</ListGroup.Item>
-            </ListGroup>
-
-            <ListGroup horizontal={"sm"} className="my-2">
-              <ListGroup.Item>&</ListGroup.Item>
-              <ListGroup.Item className="listC">Estado final</ListGroup.Item>
-            </ListGroup>
-
-            <ListGroup horizontal={"sm"} className="my-2">
-              <ListGroup.Item>|</ListGroup.Item>
-              <ListGroup.Item className="listC">
-                Utilizado para separar as opções das regras
-              </ListGroup.Item>
-            </ListGroup>
-
-            <ListGroup horizontal={"sm"} className="my-2">
-              <ListGroup.Item>Ex: (a,b,1,...)</ListGroup.Item>
-              <ListGroup.Item className="listC">
-                Estados terminais devem estar em lowercase
-              </ListGroup.Item>
-            </ListGroup>
-
-            <ListGroup horizontal={"sm"} className="my-2">
-              <ListGroup.Item>Ex: (A,B,...)</ListGroup.Item>
-              <ListGroup.Item className="listC">
-                Estados não terminais devem estar em uppercase
-              </ListGroup.Item>
-            </ListGroup>
-
-            <ListGroup horizontal={"sm"} className="my-2">
-              <ListGroup.Item className="listC">
-                Cada linha deve conter uma regra da gramática
-              </ListGroup.Item>
-            </ListGroup>
-            <ListGroup horizontal={"sm"} className="my-2">
-              <ListGroup.Item className="listC">
-                Não devem conter espaços entre as regras ou símbolos
-              </ListGroup.Item>
-            </ListGroup>
-          </div>
+        {/* Coluna de Ajuda */}
+        <Col md={6}>
+          <Card className="p-4 shadow-sm">
+            <Card.Body>
+              <Card.Title>Ajuda</Card.Title>
+              <ListGroup variant="flush">
+                <ListGroup.Item>
+                  <strong>S</strong> - Estado inicial
+                </ListGroup.Item>
+                <ListGroup.Item>
+                  <strong>&</strong> - Estado final
+                </ListGroup.Item>
+                <ListGroup.Item>
+                  <strong>|</strong> - Utilizado para separar as opções das
+                  regras
+                </ListGroup.Item>
+                <ListGroup.Item>
+                  <strong>Ex: (a,b,1,...)</strong> - Estados terminais em
+                  lowercase
+                </ListGroup.Item>
+                <ListGroup.Item>
+                  <strong>Ex: (A,B,...)</strong> - Estados não terminais em
+                  uppercase
+                </ListGroup.Item>
+                <ListGroup.Item>
+                  Cada linha deve conter uma regra da gramática
+                </ListGroup.Item>
+                <ListGroup.Item>
+                  Não devem conter espaços entre as regras ou símbolos
+                </ListGroup.Item>
+              </ListGroup>
+            </Card.Body>
+          </Card>
         </Col>
-
-        {resultado === true ? (
-          <Col className="mt-3" xs={12}>
-            <Form.Label>Grafo</Form.Label>
-            <Graph edges={dadosGrafo.edges} nodes={dadosGrafo.nodes} />
-          </Col>
-        ) : null}
-        {/* {resultado === true && af === "AFN" ? ( */}
-        {resultado === true ? (
-          <>
-            <Col className="mt-3">
-              <Form.Label>AFN</Form.Label>
-              <AFN
-                gramatica={dadosTabela.gramatica}
-                terminais={dadosTabela.terminais}
-                estadoAceitacao={dadosTabela.estadoAceitacao}
-              />
-            </Col>
-          </>
-        ) : null}
-
-        {resultado === true && af === "AFN" ? (
-          <>
-            <Col className="mt-3">
-              <Form.Label>AFD</Form.Label>
-              <AFD
-                gramatica={dadosTabela.afd}
-                terminais={dadosTabela.terminais}
-                estadoAceitacao={dadosTabela.estadoAceitacao}
-                novoAFD={dadosTabela.novoAFD}
-                estadoAceitacaoNovaAFD={dadosTabela.estadoAceitacaoNovaAFD}
-              />
-            </Col>
-          </>
-        ) : null}
       </Row>
-    </div>
+
+      {/* Seção dos resultados */}
+      {resultado && (
+        <>
+          <Row className="mt-4">
+            <Col xs={12}>
+              <Card className="p-3 shadow-sm">
+                <Card.Body>
+                  <Card.Title>Grafo</Card.Title>
+                  <Graph edges={dadosGrafo.edges} nodes={dadosGrafo.nodes} />
+                </Card.Body>
+              </Card>
+            </Col>
+          </Row>
+
+          <Row className="mt-4">
+            <Col>
+              <Card className="p-3 shadow-sm">
+                <Card.Body>
+                  <Card.Title>AFN</Card.Title>
+                  <AFN
+                    gramatica={dadosTabela.afn}
+                    terminais={dadosTabela.terminais}
+                    estadoAceitacao={dadosTabela.estadoAceitacaoAFN}
+                  />
+                </Card.Body>
+              </Card>
+            </Col>
+
+            {af === "AFN" && (
+              <Col>
+                <Card className="p-3 shadow-sm">
+                  <Card.Body>
+                    <Card.Title>AFD</Card.Title>
+                    <AFD
+                      gramatica={dadosTabela.oldAFD}
+                      terminais={dadosTabela.terminais}
+                      estadoAceitacao={dadosTabela.estadoAceitacaoAFN}
+                      novoAFD={dadosTabela.newAFD}
+                      estadoAceitacaoNovaAFD={dadosTabela.estadoAceitacaoAFD}
+                    />
+                  </Card.Body>
+                </Card>
+              </Col>
+            )}
+          </Row>
+        </>
+      )}
+    </Container>
   );
 }
