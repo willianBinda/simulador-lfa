@@ -8,11 +8,23 @@ export const geraGrafo = (gr: GR[]) => {
       (element) => element.length === 1
     );
     if (naoTerminal === "S") {
-      return {
-        id: index,
-        label: naoTerminal,
-        color: "red",
-      };
+      if (isAceitacao) {
+        return {
+          id: index,
+          label: naoTerminal,
+          color: {
+            border: "#2B7CE9",
+            background: "red",
+          },
+          borderWidth: 3,
+        };
+      } else {
+        return {
+          id: index,
+          label: naoTerminal,
+          color: "red",
+        };
+      }
     }
     if (isAceitacao) {
       return {
