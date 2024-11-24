@@ -44,29 +44,22 @@ export const geraDadosAFN = (novaGramatica: GR[], terminais: string[]) => {
         }
       }
     });
-    // console.log(dados);
+
     const novoDado = dados.map((e) => {
       return e.split(",").sort().join(",");
     });
-    // console.log("novos dados:", novoDado);
+
     return {
       [Object.keys(item)[0]]: novoDado,
     };
   });
-  // console.log("resultado: ", resultado);
-  // return resultado.sort((a, b) => {
-  //   const chaveA = Object.keys(a)[0];
-  //   const chaveB = Object.keys(b)[0];
-  //   return chaveA.localeCompare(chaveB); // Ordenação alfabética
-  // });
+
   return resultado;
 };
 
 export const geraDadosAFD = (afn: GR[], terminais: string[]) => {
   const afd: GR[] = [];
   afd.push(afn[0]);
-
-  // console.log("afd inicial: ", afd);
 
   let limite = 50;
   while (true) {
@@ -80,9 +73,6 @@ export const geraDadosAFD = (afn: GR[], terminais: string[]) => {
     const chaves = afd.map((obj) => {
       return Object.keys(obj)[0].split(",").sort().join(",");
     });
-
-    // console.log("chaves: ", chaves);
-    // console.log("OBJ: ", Object.values(afd));
 
     Object.values(afd).forEach((e) => {
       const chave = Object.keys(e)[0].split(",").sort().join(",");
@@ -120,7 +110,7 @@ export const geraDadosAFD = (afn: GR[], terminais: string[]) => {
             return [...new Set(str.split(","))].sort().join(",");
           });
           const ch = afd.map((it) => Object.keys(it)[0]);
-          // console.log(el);
+
           if (!ch.includes(el)) {
             afd.push({
               [el]: resultado,
@@ -154,7 +144,7 @@ export const geraDadosAFD = (afn: GR[], terminais: string[]) => {
     }
   });
 
-  const novoAFD = afd.map((obj) => {
+  const newAFD = afd.map((obj) => {
     const chaveOriginal = Object.keys(obj)[0];
     const novaChave = chaveMap[chaveOriginal];
 
@@ -171,7 +161,7 @@ export const geraDadosAFD = (afn: GR[], terminais: string[]) => {
     return { [novaChave]: novosValores };
   });
 
-  return { novoAFD, chaveMap, afd };
+  return { newAFD, chaveMap, oldAFD: afd };
 };
 
 export const getEstadosAceitacao = (
@@ -179,13 +169,13 @@ export const getEstadosAceitacao = (
   chaveMap: { [key: string]: string }
 ) => {
   const estadoAceitacaoAFD: string[] = [];
-  const estadoAceitacao: string[] = [];
+  const estadoAceitacaoAFN: string[] = [];
 
   novaGramatica.forEach((e) => {
     Object.values(e).forEach((el) => {
       el.forEach((item) => {
         if (item.length === 1) {
-          estadoAceitacao.push(Object.keys(e)[0]);
+          estadoAceitacaoAFN.push(Object.keys(e)[0]);
         }
       });
     });
@@ -195,10 +185,10 @@ export const getEstadosAceitacao = (
     const chaves = el.split(",");
 
     chaves.forEach((c) => {
-      if (estadoAceitacao.includes(c)) {
+      if (estadoAceitacaoAFN.includes(c)) {
         estadoAceitacaoAFD.push(chaveMap[el]);
       }
     });
   });
-  return { estadoAceitacaoAFD, estadoAceitacao };
+  return { estadoAceitacaoAFD, estadoAceitacaoAFN };
 };

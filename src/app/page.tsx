@@ -28,28 +28,28 @@ export default function Home() {
   });
 
   const [dadosTabela, setDadosTabela] = useState<{
-    gramatica: GR[];
+    afn: GR[];
+    oldAFD: GR[];
+    newAFD: GR[];
     terminais: string[];
-    estadoAceitacao: string[];
-    afd: GR[];
-    novoAFD: GR[];
-    estadoAceitacaoNovaAFD: string[];
+    estadoAceitacaoAFN: string[];
+    estadoAceitacaoAFD: string[];
   }>({
-    gramatica: [],
+    afn: [],
+    oldAFD: [],
+    newAFD: [],
     terminais: [],
-    estadoAceitacao: [],
-    afd: [],
-    novoAFD: [],
-    estadoAceitacaoNovaAFD: [],
+    estadoAceitacaoAFN: [],
+    estadoAceitacaoAFD: [],
   });
 
   const handleSimulate = () => {
-    const novaGR = geraNovaGR(rules);
-    const terminaisGR = getTerminais(novaGR);
+    const gr = geraNovaGR(rules);
+    const terminais = getTerminais(gr);
 
     try {
-      validarGramatica(novaGR, entrada);
-      setAF(isDeterministico(novaGR));
+      validarGramatica(gr, entrada);
+      setAF(isDeterministico(gr));
       setResultado(true);
     } catch (error) {
       console.log("erro validação: ", error);
@@ -57,30 +57,27 @@ export default function Home() {
     }
 
     try {
-      const data: GrafoType = geraGrafo(rules);
+      const data: GrafoType = geraGrafo(gr);
       setDadosGrafo(data);
     } catch (error) {
       console.log("erro no grafo: ", error);
     }
 
     try {
-      const afn = geraDadosAFN(novaGR, terminaisGR);
-      // console.log("gerou afn");
-      const { chaveMap, novoAFD, afd } = geraDadosAFD(afn, terminaisGR);
-      // console.log("gerou afd");
-      const { estadoAceitacao, estadoAceitacaoAFD } = getEstadosAceitacao(
-        novaGR,
+      const afn = geraDadosAFN(gr, terminais);
+      const { chaveMap, oldAFD, newAFD } = geraDadosAFD(afn, terminais);
+      const { estadoAceitacaoAFN, estadoAceitacaoAFD } = getEstadosAceitacao(
+        gr,
         chaveMap
       );
-      // console.log("gerou estados aceitacao");
 
       setDadosTabela({
-        gramatica: afn,
-        afd: afd,
-        terminais: terminaisGR,
-        novoAFD,
-        estadoAceitacao,
-        estadoAceitacaoNovaAFD: estadoAceitacaoAFD,
+        afn: afn,
+        oldAFD,
+        newAFD,
+        terminais,
+        estadoAceitacaoAFN,
+        estadoAceitacaoAFD,
       });
     } catch (error) {
       console.log("erro tabela: ", error);
@@ -105,6 +102,7 @@ export default function Home() {
 
   return (
     <div className="container mt-4">
+      <h1>Bem vindo ao Simulador de gramatica regular e Automato finito</h1>
       <Row className="containerGr">
         <Col md={6}>
           <Form>
@@ -196,9 +194,9 @@ export default function Home() {
             <Col className="mt-3">
               <Form.Label>AFN</Form.Label>
               <AFN
-                gramatica={dadosTabela.gramatica}
+                gramatica={dadosTabela.afn}
                 terminais={dadosTabela.terminais}
-                estadoAceitacao={dadosTabela.estadoAceitacao}
+                estadoAceitacao={dadosTabela.estadoAceitacaoAFN}
               />
             </Col>
           </>
@@ -209,11 +207,11 @@ export default function Home() {
             <Col className="mt-3">
               <Form.Label>AFD</Form.Label>
               <AFD
-                gramatica={dadosTabela.afd}
+                gramatica={dadosTabela.oldAFD}
                 terminais={dadosTabela.terminais}
-                estadoAceitacao={dadosTabela.estadoAceitacao}
-                novoAFD={dadosTabela.novoAFD}
-                estadoAceitacaoNovaAFD={dadosTabela.estadoAceitacaoNovaAFD}
+                estadoAceitacao={dadosTabela.estadoAceitacaoAFN}
+                novoAFD={dadosTabela.newAFD}
+                estadoAceitacaoNovaAFD={dadosTabela.estadoAceitacaoAFD}
               />
             </Col>
           </>
