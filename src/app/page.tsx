@@ -25,8 +25,10 @@ import {
   getTerminais,
 } from "@/utils/tabela";
 import AFD from "@/components/afd";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
+  const router = useRouter();
   const [rules, setRules] = useState("S->aS|aA|bB\nA->aS|bA|&\nB->aB|bS");
   const [entrada, setEntrada] = useState("aaa");
   const [af, setAF] = useState("");
@@ -114,6 +116,19 @@ export default function Home() {
       <h1 className="text-center mb-4">
         Simulador de Gramática Regular e Autômato Finito
       </h1>
+
+      {/* Botão de navegação */}
+      <div className="d-flex justify-content-end mb-4">
+        <Button
+          variant="secondary"
+          className="d-flex align-items-center"
+          onClick={() => {
+            router.push("/catraca");
+          }}
+        >
+          Catraca {"->"}
+        </Button>
+      </div>
 
       <Row>
         {/* Coluna da entrada de dados */}
